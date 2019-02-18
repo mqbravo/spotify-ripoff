@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">SpotifyRipOff</string>
+    <string name="pause">❚❚</string>
+    <string name="play">►</string>
+    <string name="skip_next">⟶</string>
+    <string name="skip_previous">⟵</string>
+    <string name="shuffle">⤨</string>
+    <string name="song_name">Song name</string>
+    <string name="artist_name">Artist name</string>
 </resources>
