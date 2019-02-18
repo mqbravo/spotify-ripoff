@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-        setInitialPlayingStatus();
     }
 
     public void pauseAndPlay(View view){
@@ -160,18 +158,6 @@ public class MainActivity extends AppCompatActivity {
             Button button = findViewById(R.id.mainActivity_stop);
             button.setText(getResources().getString(R.string.play));
         }
-    }
-
-    private void setInitialPlayingStatus(){
-        mSpotifyAppRemote.getPlayerApi().getPlayerState().setResultCallback(
-                new CallResult.ResultCallback<PlayerState>() {
-                    @Override
-                    public void onResult(PlayerState playerState) {
-                        isPlaying = !playerState.isPaused;
-                        togglePlayingStateButton();
-                    }
-                }
-        );
     }
 }
 
