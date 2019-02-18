@@ -1,6 +1,7 @@
 package com.nadiexd.spotify;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +20,6 @@ import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.ImageUri;
 import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
-import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isShuffled;
     private TextView songName;
     private TextView artistName;
+    private TextView mShuffleState;
     private ImageView albumCover;
     private SpotifyAppRemote mSpotifyAppRemote;
 
@@ -39,11 +40,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isPlaying = true;
-        isShuffled = true;
+        isPlaying = false;
+        isShuffled = false;
         songName = findViewById(R.id.mainActivity_songName);
         artistName = findViewById(R.id.mainActivity_artistName);
         albumCover = findViewById(R.id.mainActivity_albumCover);
+        mShuffleState = findViewById(R.id.mainActivity_shuffle);
     }
 
     @Override
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 new Connector.ConnectionListener() {
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         mSpotifyAppRemote = spotifyAppRemote;
+                        mSpotifyAppRemote.getPlayerApi().setShuffle(false);
+
                         Toast.makeText(MainActivity.this,"Success",Toast.LENGTH_LONG).show();
                         // Now you can start interacting with App Remote
                         connected();
@@ -77,9 +81,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connected() {
-        // Play a playlist
-        mSpotifyAppRemote.getPlayerApi().play(PLAYLIST_URI);
-
         // Subscribe to PlayerState
         mSpotifyAppRemote.getPlayerApi()
                 .subscribeToPlayerState()
@@ -94,22 +95,21 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        setInitialPlayingStatus();
     }
 
     public void pauseAndPlay(View view){
-        if(isPlaying) {
+        if(isPlaying)
             mSpotifyAppRemote.getPlayerApi().pause();
-            Button button = findViewById(R.id.mainActivity_stop);
-            button.setText(getResources().getString(R.string.play));
-        }
 
-        else{
+        else
             mSpotifyAppRemote.getPlayerApi().resume();
-            Button button = findViewById(R.id.mainActivity_stop);
-            button.setText(getResources().getString(R.string.pause));
-        }
 
         isPlaying = !isPlaying;
+
+        togglePlayingStateButton();
+
     }
 
     public void skipNext(View view){
@@ -122,9 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setShuffleMode(View view){
-        isShuffled = !isShuffled;
-        mSpotifyAppRemote.getPlayerApi().setShuffle(isShuffled);
-        Toast.makeText(this, "Ahora esta en:" + isShuffled, Toast.LENGTH_LONG).show();
+        toggleShuffleMode();
     }
 
     private void changeSongInfo(String trackName, String trackArtist,
@@ -138,6 +136,42 @@ public class MainActivity extends AppCompatActivity {
                         albumCover.setImageBitmap(bitmap);
                     }
         });
+    }
+
+    private void toggleShuffleMode(){
+        isShuffled = !isShuffled;
+        mSpotifyAppRemote.getPlayerApi().setShuffle(isShuffled);
+
+        if (isShuffled)
+            mShuffleState.setTextColor(getResources().getColor(R.color.button_green));
+
+        else
+            mShuffleState.setTextColor(getResources().getColor(R.color.white));
+
+    }
+
+    private void togglePlayingStateButton(){
+        if(isPlaying) {
+            Button button = findViewById(R.id.mainActivity_stop);
+            button.setText(getResources().getString(R.string.pause));
+        }
+
+        else{
+            Button button = findViewById(R.id.mainActivity_stop);
+            button.setText(getResources().getString(R.string.play));
+        }
+    }
+
+    private void setInitialPlayingStatus(){
+        mSpotifyAppRemote.getPlayerApi().getPlayerState().setResultCallback(
+                new CallResult.ResultCallback<PlayerState>() {
+                    @Override
+                    public void onResult(PlayerState playerState) {
+                        isPlaying = !playerState.isPaused;
+                        togglePlayingStateButton();
+                    }
+                }
+        );
     }
 }
 
