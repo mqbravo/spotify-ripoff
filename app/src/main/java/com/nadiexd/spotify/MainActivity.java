@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +22,8 @@ import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.ImageUri;
 import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         artistName = findViewById(R.id.mainActivity_artistName);
         albumCover = findViewById(R.id.mainActivity_albumCover);
         mShuffleState = findViewById(R.id.mainActivity_shuffle);
+
+        setPlaylistsRecyclerView();
     }
 
     @Override
@@ -166,5 +172,38 @@ public class MainActivity extends AppCompatActivity {
             button.setText(getResources().getString(R.string.play));
         }
     }
+
+
+    private void setPlaylistsRecyclerView(){
+        //The recycler we will be working on
+        RecyclerView playlistsRecycler = findViewById(R.id.recycler);
+
+        //Adding the "format" or behaviour the recycler will have
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        //And add it to the recycler view
+        playlistsRecycler.setLayoutManager(linearLayoutManager);
+
+        //Set its adapter by creating a new adapter from the CardView layout resource
+        PlaylistAdapterRecycler postAdapterRecyclerView = new PlaylistAdapterRecycler(getPlaylists(),
+                R.layout.cardview_playlist, this);
+        playlistsRecycler.setAdapter(postAdapterRecyclerView);
+    }
+
+    private ArrayList<Playlist> getPlaylists(){
+        ArrayList<Playlist> playlists = new ArrayList<>();
+        playlists.add(new Playlist("Trve", "spotify:user:mausk01:playlist:6wei7Upw7h4ZADK8Z6WVUU"));
+        playlists.add(new Playlist("Art-ict monkeys & TLSP", "spotify:user:mausk01:playlist:7ncnkEET7kH16dVrbby9BI" ));
+        playlists.add(new Playlist("Good trip", "spotify:user:mausk01:playlist:6DhR2kGKDZ3uSYQoevznNl"));
+
+        return playlists;
+    }
+
+
+    public void changePlaylist(String playListURI){
+        mSpotifyAppRemote.getPlayerApi().play(playListURI);
+    }
+
 }
 
