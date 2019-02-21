@@ -42,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
         isPlaying = false;
         isShuffled = false;
+
         songName = findViewById(R.id.mainActivity_songName);
+        songName.setSelected(true);
+
         artistName = findViewById(R.id.mainActivity_artistName);
         albumCover = findViewById(R.id.mainActivity_albumCover);
         mShuffleState = findViewById(R.id.mainActivity_shuffle);
@@ -109,12 +112,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void skipNext(View view){
         mSpotifyAppRemote.getPlayerApi().skipNext();
-        togglePlayingStateAndButton();
+
+        if(!isPlaying)
+            togglePlayingStateAndButton();
     }
 
     public void skipPrevious(View view){
         mSpotifyAppRemote.getPlayerApi().skipPrevious();
-        togglePlayingStateAndButton();
+
+        if(!isPlaying)
+            togglePlayingStateAndButton();
     }
 
     public void setShuffleMode(View view){
