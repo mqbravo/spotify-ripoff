@@ -104,19 +104,17 @@ public class MainActivity extends AppCompatActivity {
         else
             mSpotifyAppRemote.getPlayerApi().resume();
 
-        isPlaying = !isPlaying;
-
-        togglePlayingStateButton();
-
+        togglePlayingStateAndButton();
     }
 
     public void skipNext(View view){
         mSpotifyAppRemote.getPlayerApi().skipNext();
-
+        togglePlayingStateAndButton();
     }
 
     public void skipPrevious(View view){
         mSpotifyAppRemote.getPlayerApi().skipPrevious();
+        togglePlayingStateAndButton();
     }
 
     public void setShuffleMode(View view){
@@ -148,7 +146,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void togglePlayingStateButton(){
+    private void togglePlayingStateAndButton(){
+        isPlaying = !isPlaying;
+
         if(isPlaying) {
             Button button = findViewById(R.id.mainActivity_stop);
             button.setText(getResources().getString(R.string.pause));
